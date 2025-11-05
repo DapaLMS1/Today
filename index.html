@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Date Display</title>
+    <!-- Load Tailwind CSS for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom color for the date text */
+        .date-color {
+            color: #532A8C; /* Deep Purple */
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col justify-center items-center p-4">
+
+    <div class="bg-white shadow-2xl p-8 md:p-12 rounded-2xl flex flex-col items-center space-y-6 transform hover:scale-[1.02] transition duration-300 w-full max-w-lg">
+        
+        <!-- Date Display Container: Large Font, Deep Purple Color. Initial text is empty. -->
+        <div id="date-container" class="flex items-center space-x-4">
+            <span id="date-display" class="text-5xl lg:text-6xl font-extrabold font-mono date-color tracking-wider"></span>
+        </div>
+
+        <!-- Copy Button -->
+        <button id="copy-button" class="flex items-center justify-center px-6 py-3 bg-[#532A8C] text-white font-semibold text-sm rounded-full shadow-lg hover:bg-opacity-90 transition duration-150 active:scale-95">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 002-2H6a2 2 0 002 2z"></path></svg>
+            Copy Date
+        </button>
+    </div>
+
+    <script>
+        // Get the current date and format it as YYYY-MM-DD
+        function formatAndDisplayDate() {
+            const today = new Date();
+            const year = today.getFullYear();
+            // Month (0-11) + 1, padded to two digits
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            // Day of the month, padded to two digits
+            const day = String(today.getDate()).padStart(2, '0');
+            const formattedDate = `${year}-${month}-${day}`;
+            
+            // Inject the result into the span element
+            const displayElement = document.getElementById('date-display');
+            if (displayElement) {
+                displayElement.textContent = formattedDate;
+            }
+        }
+
+        // Copy function using document.execCommand for maximum compatibility
+        function copyDate() {
+            const dateText = document.getElementById('date-display').textContent;
+            const copyButton = document.getElementById('copy-button');
+            
+            // 1. Create a temporary textarea to hold the text
+            const tempInput = document.createElement('textarea');
+            tempInput.value = dateText;
+            document.body.appendChild(tempInput);
+            
+            // 2. Select and copy the text
+            tempInput.select();
+            
+            let success = false;
+            try {
+                success = document.execCommand('copy');
+            } catch (err) {
+                console.error('Copy failed:', err);
+            }
+            
+            // 3. Remove the temporary input
+            document.body.removeChild(tempInput);
+
+            // 4. Provide visual feedback
+            if (success) {
+                const originalText = copyButton.innerHTML;
+                // Temporarily change button appearance to indicate success
+                copyButton.innerHTML = '<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Copied!';
+                copyButton.classList.add('bg-green-600');
+                copyButton.classList.remove('bg-[#532A8C]');
+                
+                setTimeout(() => {
+                    // Restore original state
+                    copyButton.innerHTML = originalText;
+                    copyButton.classList.add('bg-[#532A8C]');
+                    copyButton.classList.remove('bg-green-600');
+                }, 1500);
+            }
+        }
+
+        // Setup and event listeners on load
+        window.onload = function() {
+            formatAndDisplayDate();
+            document.getElementById('copy-button').addEventListener('click', copyDate);
+        };
+    </script>
+</body>
+</html>
